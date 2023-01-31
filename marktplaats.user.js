@@ -1,11 +1,9 @@
 // ==UserScript==
 // @name Verwijder commerciele aanbieders
-// @description remove everything with seller link ("Bezoek website")
+// @description remove everything with promoted link
 // @match https://www.marktplaats.nl/*
-// @version          1.0
-// @ require        https://cdn.jsdelivr.net/gh/CoeJoder/waitForKeyElements.js@v1.2/waitForKeyElements.js
+// @version          1.1
 // ==/UserScript==
-/* g lobals waitForKeyElements */
 
 {
   var removeCrap = function() {
@@ -27,7 +25,6 @@
   }
 
   const observer = new MutationObserver(removeCrap);
-  // Start observing the target node for configured mutations
   observer.observe(document.querySelector("body"), { childList: true, subtree: true });
   removeCrap();
 }
