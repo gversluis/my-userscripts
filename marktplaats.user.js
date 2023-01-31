@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Verwijder commerciele aanbieders
-// @description remove everything with seller link ("Bezoek website")
+// @description remove everything with promoted link
 // @match https://www.marktplaats.nl/*
 // @version          1.0
 // ==/UserScript==
