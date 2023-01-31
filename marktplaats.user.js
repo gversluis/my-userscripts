@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name Verwijder commerciele aanbieders
-// @description remove everything with promoted link
+// @description remove everything with seller link ("Bezoek website")
 // @match https://www.marktplaats.nl/*
-// @version          1.1
+// @version          1.0
 // ==/UserScript==
 
 {
@@ -21,8 +21,7 @@
        item.style.display="none";
       }
     }
-
-  }
+  };
 
   const observer = new MutationObserver(removeCrap);
   observer.observe(document.querySelector("body"), { childList: true, subtree: true });
