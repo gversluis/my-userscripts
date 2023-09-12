@@ -25,10 +25,6 @@ GM_addStyle(`
           content: "☠";
           margin-left: 10px;
       }
-      .ReactModalPortal {
-          max-width: 90vw;
-          overflow: auto;
-      }
       .hz-Listing--list-item .hz-Listing--sellerInfo,
       .hz-Listing-seller-name-container {
           display: inline-block;
@@ -37,6 +33,16 @@ GM_addStyle(`
       .hz-Listing-seller-name-container .hz-Link {
           float: right;
       }
+      @media (min-width: 480px) {
+        .ReactModalPortal,
+        .hz-Modal--m {
+          width: 90vw !important;
+          min-width: 90vw !important;
+          max-width: 90vw !important;
+          overflow: auto;
+        }
+      }
+
 `);
 
 let bannedSellers = ["JU&JU"]; // default, some commercial sellers
