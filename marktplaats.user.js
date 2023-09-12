@@ -5,10 +5,21 @@
 // @version          1.1
 // @grant       GM_getValue
 // @grant       GM_setValue
+// @grant       GM_addStyle
 // ==/UserScript==
 
-if (typeof GM_addStyle !== 'undefined') {
-  GM_addStyle(`
+if (typeof GM_addStyle === 'undefined') {
+  var GM_addStyle = function(css) {
+    const head = document.querySelector('head');
+    if (head) {
+      const style = document.createElement('style');
+      style.textContent = css;
+      head.appendChild(style);
+    }
+  };
+}
+
+GM_addStyle(`
       .sellerDeleteAction::before {
           display: inline-block;
           content: "☠";
@@ -18,15 +29,15 @@ if (typeof GM_addStyle !== 'undefined') {
           max-width: 90vw;
           overflow: auto;
       }
-      .hz-Listing--list-item .hz-Listing--sellerInfo, .hz-Listing-seller-name-container {
+      .hz-Listing--list-item .hz-Listing--sellerInfo,
+      .hz-Listing-seller-name-container {
           display: inline-block;
           text-align: right;
       }
       .hz-Listing-seller-name-container .hz-Link {
           float: right;
       }
-  `);
-}
+`);
 
 let bannedSellers = ["JU&JU"]; // default, some commercial sellers
 let removeCrapFlag = 1;
@@ -104,7 +115,7 @@ let removeCrapFlag = 1;
   setInterval(function() {
     if (removeCrapFlag) {
       removeCrap(bannedSellers);
-      removeCrapFlag=0;
+      removeCrapFlag = 0;
     }
   }, 500);
 
