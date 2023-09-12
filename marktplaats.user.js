@@ -14,10 +14,18 @@ if (typeof GM_addStyle !== 'undefined') {
 	        content: "☠";
 	        margin-left: 10px;
 	    }
-		.ReactModalPortal {
-			max-width: 100%;
-			overflow: auto;
-		}
+	    .ReactModalPortal {
+	        max-width: 90vw;
+	        overflow: auto;
+	    }
+	    .hz-Listing--list-item .hz-Listing--sellerInfo,
+	    .hz-Listing-seller-name-container {
+	        display: inline-block;
+	        text-align: right;
+	    }
+	    .hz-Listing-seller-name-container .hz-Link {
+	        float: right;
+	    }
 	`);
 }
 
