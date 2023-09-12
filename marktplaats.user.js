@@ -9,24 +9,23 @@
 
 if (typeof GM_addStyle !== 'undefined') {
   GM_addStyle(`
-	    .sellerDeleteAction::before {
-	        display: inline-block;
-	        content: "☠";
-	        margin-left: 10px;
-	    }
-	    .ReactModalPortal {
-	        max-width: 90vw;
-	        overflow: auto;
-	    }
-	    .hz-Listing--list-item .hz-Listing--sellerInfo,
-	    .hz-Listing-seller-name-container {
-	        display: inline-block;
-	        text-align: right;
-	    }
-	    .hz-Listing-seller-name-container .hz-Link {
-	        float: right;
-	    }
-	`);
+      .sellerDeleteAction::before {
+          display: inline-block;
+          content: "☠";
+          margin-left: 10px;
+      }
+      .ReactModalPortal {
+          max-width: 90vw;
+          overflow: auto;
+      }
+      .hz-Listing--list-item .hz-Listing--sellerInfo, .hz-Listing-seller-name-container {
+          display: inline-block;
+          text-align: right;
+      }
+      .hz-Listing-seller-name-container .hz-Link {
+          float: right;
+      }
+  `);
 }
 
 let bannedSellers = ["JU&JU"]; // default, some commercial sellers
