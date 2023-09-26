@@ -2,7 +2,7 @@
 // @name Verwijder commerciele aanbieders
 // @description remove everything with seller link ("Bezoek website")
 // @match https://www.marktplaats.nl/*
-// @version          1.1
+// @version          2.0
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
@@ -67,15 +67,24 @@ GM_addStyle(`
     }
   };
 
+  let getBannedName = function(item) {
+      let sellerElement = item.querySelector('.hz-Listing-seller-name-container>a');
+      let sellerName = sellerElement.innerText;
+      let sellerLocation = item.querySelector('.hz-Listing--sellerInfo .hz-Listing-distance-label').innerText;
+      // should use the sellerId but marktplaats does a lot of work to hide it. The chance that people have the same name and location is small enough
+      return sellerName+"::"+sellerLocation; // not a good way but it is fast :) and their location is acceptable
+  };
+  
   let sellerDeleteAction = function(event) {
     event.stopPropagation();
     event.preventDefault();
-    let seller = this.parentElement.querySelector(".hz-Listing-seller-name").innerText;
+    let item = this.closest(".hz-Listing");
+    let bannedName = getBannedName(item);
     if (debug) {
-      console.log("Ban seller?", seller);
+      console.log("Ban seller?", bannedName);
     }
-    if (confirm('Are you sure you want to ban seller ' + seller + "?")) {
-      bannedSellers.push(seller);
+    if (confirm('Are you sure you want to ban seller ' + bannedName + "?")) {
+      bannedSellers.push(bannedName);
       GM_setValue("marktplaatsbannedsellers", bannedSellers);
       if (debug) {
         console.log('banned sellers list', GM_listValues());
@@ -99,20 +108,20 @@ GM_addStyle(`
         item.style.display = "none";
       }
       // check banned sellers
-      let sellerElement = item.querySelector('.hz-Listing-seller-name-container>a');
-      let sellerName = sellerElement.innerText;
-      if (bannedSellers.includes(sellerName)) {
+      let bannedName = getBannedName(item);
+      if (bannedSellers.includes(bannedName)) {
         if (debug) {
           console.log("Hide seller", sellerName);
         }
         item.style.display = "none";
       }
       // add ban action
-      if (!sellerElement.getAttribute('data-has-delete')) {
-        sellerElement.setAttribute('data-has-delete', "true");
+      if (!item.getAttribute('data-has-delete')) {
+        item.setAttribute('data-has-delete', "true");
         let sellerDeleteActionElement = document.createElement('div');
         sellerDeleteActionElement.className = 'sellerDeleteAction';
         sellerDeleteActionElement.addEventListener("click", sellerDeleteAction);
+        let sellerElement = item.querySelector('.hz-Listing-seller-name-container>a');
         sellerElement.appendChild(sellerDeleteActionElement);
       }
     }
