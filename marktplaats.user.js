@@ -21,10 +21,10 @@ if (typeof GM_addStyle === 'undefined') {
 
 GM_addStyle(`
       .sellerDeleteAction::before {
-          display: inline-block;
-          content: "☠";
-          font-size: 10mm;
-          margin-left: 10px;
+          display: block;
+          content: "🧻";
+          font-size: 8mm;
+          margin: 4px 0 0px 10px;
       }
       .hz-Listing--list-item .hz-Listing--sellerInfo,
       .hz-Listing-seller-name-container {
@@ -70,7 +70,7 @@ GM_addStyle(`
   let getBannedName = function(item) {
       let sellerElement = item.querySelector('.hz-Listing-seller-name-container>a');
       let sellerName = sellerElement.innerText;
-      let sellerLocation = item.querySelector('.hz-Listing--sellerInfo .hz-Listing-distance-label, .hz-Listing--sellerInfo .hz-Listing-location').innerText.split("\n")[0];
+      let sellerLocation = Array.from(item.querySelectorAll(".hz-Listing--sellerInfo .hz-Listing-location .hz-Listing-distance-label, .hz-Listing--sellerInfo .hz-Listing-location")).pop().innerText.split("\n")[0];
       // should use the sellerId but marktplaats does a lot of work to hide it. The chance that people have the same name and location is small enough
       return sellerName+"::"+sellerLocation; // not a good way but it is fast :) and their location is acceptable
   };
