@@ -23,6 +23,7 @@ GM_addStyle(`
       .sellerDeleteAction::before {
           display: inline-block;
           content: "☠";
+          font-size: 10mm;
           margin-left: 10px;
       }
       .hz-Listing--list-item .hz-Listing--sellerInfo,
@@ -33,6 +34,11 @@ GM_addStyle(`
       .hz-Listing-seller-name-container .hz-Link {
           float: right;
       }
+      /* distraction from the page for why you came there in the first place */
+      #homepage-root {
+          display: none;
+      }
+      /* fix response model dialog being wider than the viewing port, wonder why they did not discover this bug themselves */
       @media (min-width: 480px) {
         .ReactModalPortal,
         .hz-Modal--m {
@@ -45,69 +51,77 @@ GM_addStyle(`
 
 `);
 
-let bannedSellers = ["JU&JU"]; // default, some commercial sellers
-let removeCrapFlag = 1;
 {
+  const debug = false;
+  let bannedSellers = []; // default, some commercial sellers
+  let removeCrapFlag = 1;
+  let removeCrap = function() {}; // redefined later
 
   let removeBanners = function() {
     let banners = document.querySelectorAll(".hz-Banner, .hz-Listings__container--cas, .hz-Listings__container--casGallery, #adsense-container");
     for (let banner of banners) {
-      console.log("Hide banners", banner);
+      if (debug) {
+        console.log("Hide banners", banner);
+      }
       banner.style.display = "none";
     }
   };
 
-
-  let removeCrap = function(bannedSellers) {
-
-    let sellerDeleteAction = function(event) {
-      event.stopPropagation();
-      event.preventDefault();
-      let seller = this.parentElement.querySelector(".hz-Listing-seller-name").innerText;
-      if (confirm('Are you sure you want to ban seller ' + seller + "?")) {
-        console.log("Ban seller", seller);
-        bannedSellers.push(seller);
-        GM_setValue("marktplaatsbannedsellers", bannedSellers);
+  let sellerDeleteAction = function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    let seller = this.parentElement.querySelector(".hz-Listing-seller-name").innerText;
+    if (debug) {
+      console.log("Ban seller?", seller);
+    }
+    if (confirm('Are you sure you want to ban seller ' + seller + "?")) {
+      bannedSellers.push(seller);
+      GM_setValue("marktplaatsbannedsellers", bannedSellers);
+      if (debug) {
         console.log('banned sellers list', GM_listValues());
-        removeCrap(bannedSellers);
       }
-    };
+      removeCrap(bannedSellers);
+    }
+  };
 
-    console.log('bannedSellers', bannedSellers);
+  removeCrap = function(bannedSellers) {
+    if (debug) {
+      console.log('removeCrap, bannedSellers', bannedSellers);
+    }
     removeBanners();
 
     let items = document.querySelectorAll(".hz-Listing");
     for (let item of items) {
-      if (item.innerText.match(/(Bezorgt in|Topadvertentie|Dagtopper|Heel Nederland|Bezoek website|Naar website)/)) {
-        console.log("Hide item", item);
+      if (item.innerText.match(/(Bezorgt in|Topadvertentie|Dagtopper|Heel Nederland|Bezoek website|Naar website|huur|Gevraagd|Gezocht)/i)) {
+        if (debug) {
+          console.log("Hide item", item);
+        }
         item.style.display = "none";
       }
       // check banned sellers
-      let sellers = item.querySelectorAll(".hz-Listing-seller-name, .hz-Listing-seller-name");
-      console.log('add delete action', sellers);
-      for (let seller of sellers) {
-        if (bannedSellers.includes(seller.innerText)) {
-          console.log("Hide seller", seller);
-          item.style.display = "none";
-        } else if (!seller.getAttribute('data-has-delete')) {
-          // add ban action
-          seller.setAttribute('data-has-delete', "true");
-          let sellerDeleteActionElement = document.createElement('div');
-          sellerDeleteActionElement.className = 'sellerDeleteAction';
-          sellerDeleteActionElement.addEventListener("click", sellerDeleteAction);
-          seller.insertAdjacentElement('afterend', sellerDeleteActionElement);
+      let sellerElement = item.querySelector('.hz-Listing-seller-name-container>a');
+      let sellerName = sellerElement.innerText;
+      if (bannedSellers.includes(sellerName)) {
+        if (debug) {
+          console.log("Hide seller", sellerName);
         }
+        item.style.display = "none";
+      }
+      // add ban action
+      if (!sellerElement.getAttribute('data-has-delete')) {
+        sellerElement.setAttribute('data-has-delete', "true");
+        let sellerDeleteActionElement = document.createElement('div');
+        sellerDeleteActionElement.className = 'sellerDeleteAction';
+        sellerDeleteActionElement.addEventListener("click", sellerDeleteAction);
+        sellerElement.appendChild(sellerDeleteActionElement);
       }
     }
 
   };
 
-
-  // incheck if GM does exist in context
+  // check if GM does exist in context (does not exist in page context when run is clicked)
   if (typeof GM_getValue !== 'undefined') {
     bannedSellers = GM_getValue("marktplaatsbannedsellers", bannedSellers);
-  } else {
-    console.log("Run in page context");
   }
   // monitor future changes
   const observer = new MutationObserver(function() {
@@ -119,7 +133,7 @@ let removeCrapFlag = 1;
   });
 
   setInterval(function() {
-    if (removeCrapFlag) {
+    if (!document.hidden && removeCrapFlag) {
       removeCrap(bannedSellers);
       removeCrapFlag = 0;
     }
