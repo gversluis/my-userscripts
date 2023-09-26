@@ -70,11 +70,11 @@ GM_addStyle(`
   let getBannedName = function(item) {
       let sellerElement = item.querySelector('.hz-Listing-seller-name-container>a');
       let sellerName = sellerElement.innerText;
-      let sellerLocation = item.querySelector('.hz-Listing--sellerInfo .hz-Listing-distance-label').innerText;
+      let sellerLocation = item.querySelector('.hz-Listing--sellerInfo .hz-Listing-distance-label, .hz-Listing--sellerInfo .hz-Listing-location').innerText.split("\n")[0];
       // should use the sellerId but marktplaats does a lot of work to hide it. The chance that people have the same name and location is small enough
       return sellerName+"::"+sellerLocation; // not a good way but it is fast :) and their location is acceptable
   };
-  
+
   let sellerDeleteAction = function(event) {
     event.stopPropagation();
     event.preventDefault();
