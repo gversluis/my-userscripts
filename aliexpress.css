@@ -1,0 +1,37 @@
+/*
+==UserCSS==
+@name             Hide aliexpress crap
+@match            https://*.aliexpress.com/*
+@version          1.0
+==/UserCSS==
+*/
+/* hide Aliexpress advertisement and distraction */
+#header-float-banner,
+#smartbanner-main,
+#home-firstscreen,
+.hm-left-store,
+.hm-right,
+#top-lighthouse,
+.drogue-poplayer-modal,
+.site-server-box,
+img[class*="qrCode"],
+div[id*="-banner-"],
+div[id*="_banner_"],
+div[id*="-sale-"],
+div[id*="super-deals"],
+div[id*="-new-mall"],
+div[class*="-sale-module-"],
+div[id*="-sd-combination-"],
+div[id*="-diamond-"],
+div[id*="-choice-combination-"] {
+  display: none;
+}
+
+.index-page #top-lighthouse {
+  display: block;
+}
+
+/* display more of the item description */
+iframe[class^="overview--iframe--"] {
+  height: 2000px;
+}
