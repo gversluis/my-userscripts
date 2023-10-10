@@ -2,55 +2,12 @@
 // @name Marktplaats Verwijder commerciele aanbieders
 // @description remove everything with seller link ("Bezoek website")
 // @match https://www.marktplaats.nl/*
-// @version          3.0
+// @version          3.1
 // @run-at           document-start
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_addStyle
 // ==/UserScript==
-
-if (typeof GM_addStyle === 'undefined') {
-  var GM_addStyle = function(css) {
-    const head = document.querySelector('head');
-    if (head) {
-      const style = document.createElement('style');
-      style.textContent = css;
-      head.appendChild(style);
-    }
-  };
-}
-
-GM_addStyle(`
-      .sellerDeleteAction::before {
-          display: block;
-          content: "💀";
-          font-size: 8mm;
-          margin: 4px 0 0px 10px;
-      }
-      .hz-Listing--list-item .hz-Listing--sellerInfo,
-      .hz-Listing-seller-name-container {
-          display: inline-block;
-          text-align: right;
-      }
-      .hz-Listing-seller-name-container .hz-Link {
-          float: right;
-      }
-      /* distraction from the page for why you came there in the first place */
-      #homepage-root {
-          display: none;
-      }
-      /* fix response model dialog being wider than the viewing port, wonder why they did not discover this bug themselves */
-      @media (min-width: 480px) {
-        .ReactModalPortal,
-        .hz-Modal--m {
-          width: 90vw !important;
-          min-width: 90vw !important;
-          max-width: 90vw !important;
-          overflow: auto;
-        }
-      }
-
-`);
 
 let listings = [];
 {
@@ -113,7 +70,7 @@ let listings = [];
     }
     return item.getAttribute('data-listing-id');
   };
-  
+
   let getBannedName = function(item) {
     let listingId = getListingId(item);
     // let seller = item.querySelector(".hz-Listing-seller-name").innerText;
@@ -210,3 +167,56 @@ let listings = [];
     }, 500);
   });
 }
+
+
+
+let addStyle = function(css) {
+  const head = document.querySelector('head');
+  if (head) {
+    const style = document.createElement('style');
+    style.textContent = css;
+    head.appendChild(style);
+  }
+};
+
+addStyle(`
+      .sellerDeleteAction::before {
+          display: block;
+          content: "💀";
+          font-size: 8mm;
+          margin: 4px 0 0px 10px;
+      }
+      /* show seller name and delete action on mobile */
+      html body .hz-Listing--list-item .hz-Listing--sellerInfo,
+      html body .hz-Listing-seller-name-container {
+          display: inline-block;
+          text-align: right;
+      }
+      /* we do not need the other distance anymore since it is included with the seller info */
+      html body .hz-Listing--list-item .hz-Listing-group--mobile-bottom-row {
+          display: none;
+      }
+      .hz-Listing-seller-name-container .hz-Link {
+          float: right;
+      }
+      .hz-Listing-seller-name {
+          max-width: 100px;
+          white-space: break-spaces;
+          word-wrap: anywhere;
+      }
+      /* distraction from the page for why you came there in the first place */
+      #homepage-root {
+          display: none;
+      }
+      /* fix response model dialog being wider than the viewing port, wonder why they did not discover this bug themselves */
+      @media (min-width: 480px) {
+        .ReactModalPortal,
+        .hz-Modal--m {
+          width: 90vw !important;
+          min-width: 90vw !important;
+          max-width: 90vw !important;
+          overflow: auto;
+        }
+      }
+
+`);
