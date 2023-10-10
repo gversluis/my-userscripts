@@ -3,8 +3,7 @@
 // @match            *://*movies*
 // @grant            GM_addStyle
 // @version          1.0
-//
-// CHANGE THE MATCH NAME YOURSELF
+// @run-at           document-end
 // Use in combination with:
 // - Add-on Absolute Enable Right CLick & Copy - Absolute mode
 // OR
@@ -31,9 +30,9 @@ GM_addStyle(`
 	 user-select: text !important;
 }
 
-.imdb-score {
+
+.gbullet {
 	position: absolute;
-	right: 0px;
 	background-color: #fff;
 	color: #000;
 	border-radius: 50%;
@@ -44,6 +43,33 @@ GM_addStyle(`
 	padding-top: 5px;
 	text-align: center;
 }
+.rating {
+	right: 25px;
+  font-size: 14px;
+	width: 22px;
+	height: 22px;
+}
+
+.imdb-score {
+	right: 0px;
+}
+
+div[data-quality="itemAbsolute_cam"] img,
+div[data-imdb^="IMDb: 0"] p,
+div[data-imdb^="IMDb: 1"] p,
+div[data-imdb^="IMDb: 2"] p,
+div[data-imdb^="IMDb: 3"] p,
+div[data-imdb^="IMDb: 4"] p,
+div[data-imdb^="IMDb: 5"] p,
+div[data-imdb^="IMDb: 0"] img,
+div[data-imdb^="IMDb: 1"] img,
+div[data-imdb^="IMDb: 2"] img,
+div[data-imdb^="IMDb: 3"] img,
+div[data-imdb^="IMDb: 4"] img,
+div[data-imdb^="IMDb: 5"] img {
+  opacity: 0.3;
+}
+
 `);
 
 
@@ -73,24 +99,17 @@ GM_addStyle(`
     let imdbScores = document.querySelectorAll('div[data-imdb]');
     for (let imdbScoreElement of imdbScores) {
       let imdbScore = (imdbScoreElement.getAttribute('data-imdb').match(/\d(.\d)?/) || ['0'])[0];
-
+      let rating = imdbScoreElement.getAttribute('data-rating');
       let displayImdbScore = imdbScoreElement.querySelector('.imdb-score');
       if (!displayImdbScore) {
         imdbScoreElement.querySelector('a').after(
-          createElementFromHTML('<div class="imdb-score">' + imdbScore + '</div>')
+          createElementFromHTML('<div class="gbullet imdb-score">' + imdbScore + '</div>')
+        );
+        imdbScoreElement.querySelector('a').after(
+          createElementFromHTML('<div class="gbullet rating">' + Math.round(rating * 2, 2) + '</div>')
         );
       }
-
-      if (imdbScore < 6) {
-        imdbScoreElement.querySelector('img').style.opacity = 0.3;
-      }
     }
-
-    let lowQualities = document.querySelectorAll('div[data-quality="itemAbsolute_cam"]');
-    for (let lowQuality of lowQualities) {
-      lowQuality.querySelector('img').style.opacity = 0.3;
-    }
-
   };
 
   setInterval(function() {
