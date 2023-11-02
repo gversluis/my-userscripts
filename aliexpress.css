@@ -2,17 +2,21 @@
 ==UserCSS==
 @name             Hide aliexpress crap
 @match            https://*.aliexpress.com/*
-@version          1.1
+@version          1.2
 ==/UserCSS==
 */
 /* hide Aliexpress advertisement and distraction */
+.index-page .common-floor,
+div.image-poplayer-modal,
+div.drogue-poplayer-modal,
 #header-float-banner,
 #smartbanner-main,
 #home-firstscreen,
+div[data-spm="search_ranking"],
 .hm-left-store .header-categories,
 div[class*="appScan--container"],
 .pdp-store-menu-wrap,
-.hm-right,
+.index-page .hm-right,
 #top-lighthouse .ng-seller-wrap,
 #top-lighthouse .ng-help-wrap,
 a[href*="//m.aliexpress.com/category.html?categoryTab="],
