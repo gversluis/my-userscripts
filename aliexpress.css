@@ -6,9 +6,12 @@
 ==/UserCSS==
 */
 /* hide Aliexpress advertisement and distraction */
+.faas-home-page div[style="display: block; z-index: 1000000;"],
 .index-page .common-floor,
 div.image-poplayer-modal,
-div.drogue-poplayer-modal,
+html body div div.drogue-poplayer-modal,
+div.image-poplayer-modal,
+div[class^="down-load-app--menuItem"],
 #header-float-banner,
 #smartbanner-main,
 #home-firstscreen,
@@ -21,7 +24,6 @@ div[class*="appScan--container"],
 #top-lighthouse .ng-help-wrap,
 a[href*="//m.aliexpress.com/category.html?categoryTab="],
 a[href*="https://star.aliexpress.com/"],
-.drogue-poplayer-modal,
 .site-server-box,
 img[class*="qrCode"],
 div[id*="-banner-"],
@@ -35,7 +37,7 @@ div[id*="-diamond-"],
 div[id*="-choice-combination-"],
 div[data-type="product-list-v3"],
 div[data-type="y2023-nn"] {
-  display: none;
+  display: none !important;
 }
 
 .index-page #top-lighthouse {
