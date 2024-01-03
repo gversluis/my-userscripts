@@ -1,0 +1,70 @@
+// ==UserScript==
+// @name             Aliexpress order fetcher
+// @match            https://www.aliexpress.com/p/order/detail.html*
+// @version          1.0
+// @run-at           document-start
+// @grant            GM_getValue
+// @grant            GM_setValue
+// @grant            GM_deleteValue
+// @description      Fetches img and name per orderid and displays the result (which you can print to PDF)
+// @description      Asks for orderids which you can get from the mail subjects
+// @description      Tested with 434 unique orderids
+// @description      Get unique orderid's in Linux: grep -iRsl "^from:.*AliExpress" /home/**/Maildir/.Orders | xargs grep "Subject: .*" | grep -Po "\d\d\d\d\d\d\d\d\d\d\d\d+" | sort | uniq
+// ==/UserScript==
+
+try {
+  let hasRun = 0;
+  let baseUrl = "https://www.aliexpress.com/p/order/detail.html?orderId=";
+  let saveOrderDetailsOption = function() {
+    if (!hasRun) {
+      hasRun++;
+      console.log("FETCHER", "saveOrderDetailsOption");
+      let orderIds = GM_getValue('alisOrderIds') || [];
+      let orderDetails = GM_getValue('alisOrderDetails') || [];
+      if (orderIds.length) {
+        // check if current orderid is first id
+        if (this.location.href.includes(orderIds[0])) {
+          let title = document.querySelector('.item-title');
+          let img = document.querySelector('.order-detail-item-content-img');
+          let details = [
+            orderIds.shift(),
+            title ? title.innerText : '',
+            img ? img.style.backgroundImage.substring(5,img.style.backgroundImage.length-2) : ''
+          ];
+          orderDetails.push(details);
+          GM_setValue('alisOrderIds', orderIds);
+          GM_setValue('alisOrderDetails', orderDetails);
+          console.log('FETCHER orderDetails', details, orderDetails);
+        }
+        if (orderIds.length) {
+          window.location.href = baseUrl + orderIds[0];
+        } else {
+          GM_deleteValue('alisOrderIds');
+          document.body.innerHTML = '';
+          orderDetails.forEach(details => {
+            let detailsElement = document.createElement('div');
+            let orderId = details[0];
+            let title = details[1];
+            let img = details[2];
+            detailsElement.innerHTML = '<li><img src="'+img+'" height="100"><div style="margin-left: 1cm; display:inline-block"><a href="'+baseUrl+orderId+'" target="_blank">'+orderId+'</a><br>'+title+'</div>';
+            document.body.appendChild(detailsElement);
+          });
+
+        }
+      } else {
+        // prompt orderids
+        let orderIdsString = window.prompt('Fill in orderids', '3028365101806159 83645927426159');
+        let orderIds = orderIdsString ? orderIdsString.split(/[,\s]+/) : [];
+        if (orderIds.length) {
+          GM_setValue('alisOrderIds', orderIds);
+          GM_deleteValue('alisOrderDetails');
+          window.location.href = "https://www.aliexpress.com/p/order/detail.html?orderId=" + orderIds[0];
+        }
+      }
+    }
+  };
+  addEventListener("load", () => setTimeout(saveOrderDetailsOption, 1000));
+
+} catch (e) {
+  console.log("FETCHER ERROR", e);
+}
