@@ -49,3 +49,17 @@ iframe[class^="overview--iframe--"] {
   height: 2000px !important;
   overflow: auto !important;
 }
+
+/* make yellow stars */
+.ae-stars-box {
+  filter: grayscale(100%) invert(100%) sepia(100%) saturate(1000%) brightness(80%)
+}
+div[class^="multi--starList--"] img[class^="multi--star--"] {
+  filter: invert(100%); /* only because of the dark mode filter */
+}
+div[class^="multi--starList--"] div[class^="multi--progress--"] {
+  background-color: #c8c800 !important;
+}
+div[class^="rating--wrap--"] {
+  filter: grayscale(100%) sepia(100%) saturate(1000%) brightness(80%)
+}
