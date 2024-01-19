@@ -2,7 +2,7 @@
 // @name             360 to 720
 // @match            *://*movies*
 // @grant            GM_addStyle
-// @version          2.1
+// @version          2.2
 // @run-at           document-end
 // Use in combination with:
 // - Add-on Absolute Enable Right CLick & Copy - Absolute mode
@@ -106,7 +106,7 @@ GM_addStyle(`
     paragraph.innerHTML = '<a download="' + filename + '" href="' + url + '">' + filename + ' (' + resolution + ')</a>';
     downloadElement.appendChild(paragraph);
     let button = document.createElement('button');
-    button.innerText = '?? ';
+    button.innerText = '📋 ';
     button.className = 'clipboard';
     button.onclick = function() {
       console.log('Copy to clipboard');
@@ -208,7 +208,7 @@ GM_addStyle(`
         if (match) {
           let subtitles = JSON.parse(match[1]);
           console.log("FOUND SUBS", subtitles);
-          subtitles.forEach(subtitle => showDownloadLink(subtitle.src, 'Subtitle ' + (subtitle.lang || subtitle.label), '.srt'));
+          subtitles.forEach(subtitle => showDownloadLink(subtitle.src, 'Subtitle ' + (subtitle.label || subtitle.lang), '.srt'));
         }
       }
     }
