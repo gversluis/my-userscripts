@@ -2,7 +2,7 @@
 // @name             360 to 720
 // @match            *://*movies*
 // @grant            GM_addStyle
-// @version          2.0
+// @version          2.1
 // @run-at           document-end
 // Use in combination with:
 // - Add-on Absolute Enable Right CLick & Copy - Absolute mode
