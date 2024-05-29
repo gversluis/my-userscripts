@@ -2,7 +2,7 @@
 // @name Marktplaats Verwijder commerciele aanbieders
 // @description remove everything with seller link ("Bezoek website")
 // @match https://www.marktplaats.nl/*
-// @version          3.1
+// @version          3.2
 // @run-at           document-start
 // @grant       GM_getValue
 // @grant       GM_setValue
