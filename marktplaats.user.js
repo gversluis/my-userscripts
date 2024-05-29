@@ -148,7 +148,7 @@ let listings = [];
   if (typeof GM_getValue !== 'undefined') {
     bannedSellers = GM_getValue("marktplaatsbannedsellers", bannedSellers);
   }
-
+ 	let ignoreUser = window.location.pathname.startsWith("/u");
   addEventListener("load", () => {
     // monitor future changes
     const observer = new MutationObserver(function() {
@@ -161,7 +161,7 @@ let listings = [];
 
     setInterval(function() {
       if (!document.hidden && removeCrapFlag) {
-        removeCrap(bannedSellers);
+        removeCrap(ignoreUser ? [] : bannedSellers);
         removeCrapFlag = 0;
       }
     }, 500);
@@ -208,6 +208,20 @@ addStyle(`
       #homepage-root {
           display: none;
       }
+
+      /* I'm not sure what they did with the selectbox but here the colors are white on lightgrey so lets fix that */
+      select option {
+      	color: #ccc !important;
+        background: #333 !important;
+      }
+
+      /* I'm here for the board games, now lets hope they won't change category id's */
+      select option[value="1233"],
+      select option[value="2743"],
+      select option[value="2744"] {
+      	font-weight: bolder;
+      }
+
       /* fix response model dialog being wider than the viewing port, wonder why they did not discover this bug themselves */
       @media (min-width: 480px) {
         .ReactModalPortal,
