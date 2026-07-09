@@ -2,7 +2,7 @@
 // @name Marktplaats Verwijder commerciele aanbieders
 // @description remove everything with seller link ("Bezoek website")
 // @match https://www.marktplaats.nl/*
-// @version          3.6
+// @version          3.7
 // @run-at           document-start
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -37,7 +37,9 @@ let listings = [];
       return result;
     },
   };
-  unsafeWindow.fetch = exportFunction(new Proxy(window.fetch, proxyFetch), unsafeWindow);
+  if (typeof(unsafeWindow) !== 'undefined') {
+  	unsafeWindow.fetch = exportFunction(new Proxy(window.fetch, proxyFetch), unsafeWindow);
+  }
 
   let removeBanners = function() {
     let banners = document.querySelectorAll(".hz-Banner, .hz-Listings__container--cas, .hz-Listings__container--casGallery, #adsense-container");
@@ -154,13 +156,12 @@ let listings = [];
         //}
         item.style.display = "none";
       }
+
+      let sellerElements = getSellerAnchors(item);
+      console.warn("Found sellerElements", sellerElements, item);
       if (!item.getAttribute('data-has-delete')) {
-        let sellerElements = getSellerAnchors(item);
 
         sellerElements.forEach(sellerElement => {
-          if (debug) {
-            console.warn("Found sellerElement", sellerElement, item);
-          }
           let sellerDeleteActionElement = document.createElement('div');
           sellerDeleteActionElement.className = 'sellerDeleteAction';
           sellerDeleteActionElement.addEventListener("click", sellerDeleteAction);
