@@ -2,7 +2,7 @@
 // @name Marktplaats Verwijder commerciele aanbieders
 // @description remove everything with seller link ("Bezoek website")
 // @match https://www.marktplaats.nl/*
-// @version          3.3
+// @version          3.4
 // @run-at           document-start
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -51,7 +51,7 @@ let listings = [];
 
   let getListingId = function(item) {
     if (!item.getAttribute('data-listing-id')) {
-      let imgElement = item.querySelector(".hz-Listing-image-item img");
+      let imgElement = item.querySelector("img");
       if (imgElement) {
         let img = imgElement.getAttribute("src");
         listings.forEach( (listing, nr) => {
@@ -60,7 +60,11 @@ let listings = [];
           }
         });
       } else {
-        let sellerName = item.querySelector(".hz-Listing-seller-name").innerText;
+        
+        let sellerName = item.querySelector(".hz-Listing-sellerInfo a")?.innerText;
+        if (debug) {
+          console.log("Seller name", sellerName);
+        }
         listings.forEach( (listing, nr) => {
           if (!listing.pictures && listing.sellerInformation.sellerName === sellerName) {
             item.setAttribute('data-listing-id', nr);
@@ -132,7 +136,7 @@ let listings = [];
         item.style.display = "none";
       }
       if (!item.getAttribute('data-has-delete')) {
-        let sellerElement = item.querySelector('.hz-Listing-sellerInfo>span>a');
+        let sellerElement = item.querySelector('.hz-Listing-sellerInfo a');
         if (sellerElement) {
           item.setAttribute('data-has-delete', "true");
           let sellerDeleteActionElement = document.createElement('div');
