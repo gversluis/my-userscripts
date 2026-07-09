@@ -2,7 +2,7 @@
 // @name Marktplaats Verwijder commerciele aanbieders
 // @description remove everything with seller link ("Bezoek website")
 // @match https://www.marktplaats.nl/*
-// @version          3.4
+// @version          3.5
 // @run-at           document-start
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -136,14 +136,15 @@ let listings = [];
         item.style.display = "none";
       }
       if (!item.getAttribute('data-has-delete')) {
-        let sellerElement = item.querySelector('.hz-Listing-sellerInfo a');
-        if (sellerElement) {
+        let sellerElements = item.querySelectorAll(".hz-Listing-sellerInfo a, .hz-Listing-sellerInfoPriority a");
+        
+        sellerElements.forEach(sellerElement => {
           item.setAttribute('data-has-delete', "true");
           let sellerDeleteActionElement = document.createElement('div');
           sellerDeleteActionElement.className = 'sellerDeleteAction';
           sellerDeleteActionElement.addEventListener("click", sellerDeleteAction);
           sellerElement.appendChild(sellerDeleteActionElement);
-        }
+        });
       }
     }
   };
