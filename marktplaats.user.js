@@ -2,7 +2,7 @@
 // @name Marktplaats Verwijder commerciele aanbieders
 // @description remove everything with seller link ("Bezoek website")
 // @match https://www.marktplaats.nl/*
-// @version          3.5
+// @version          3.6
 // @run-at           document-start
 // @grant       GM_getValue
 // @grant       GM_setValue
@@ -11,7 +11,7 @@
 
 let listings = [];
 {
-  const debug = false;
+  const debug = true;
   let bannedSellers = []; // default, some commercial sellers
   let removeCrapFlag = 1;
   let removeCrap = function() {}; // redefined later
@@ -28,7 +28,7 @@ let listings = [];
         if (args[0].startsWith("/lrp/api/search?")) {
           clone.json().then((json) => {
             listings = json.listings;
-            listings.forEach(listing => listing.img = ((listing.pictures || [])[0] || {url:''}).url.split('$')[0]);
+            listings.forEach(listing => listing.img = ((listing.pictures || [])[0] || { url: '' }).url.split('$')[0]);
             console.log('listings', listings);
           });
         }
@@ -54,18 +54,17 @@ let listings = [];
       let imgElement = item.querySelector("img");
       if (imgElement) {
         let img = imgElement.getAttribute("src");
-        listings.forEach( (listing, nr) => {
+        listings.forEach((listing, nr) => {
           if (listing.pictures && img.startsWith(listing.img)) {
             item.setAttribute('data-listing-id', nr);
           }
         });
       } else {
-        
         let sellerName = item.querySelector(".hz-Listing-sellerInfo a")?.innerText;
         if (debug) {
           console.log("Seller name", sellerName);
         }
-        listings.forEach( (listing, nr) => {
+        listings.forEach((listing, nr) => {
           if (!listing.pictures && listing.sellerInformation.sellerName === sellerName) {
             item.setAttribute('data-listing-id', nr);
           }
@@ -83,9 +82,18 @@ let listings = [];
     }
     let listing = listings[listingId];
     if (listing && listing.sellerInformation) {
-      console.log("GERBEN", listing.sellerInformation.sellerId, listing, item);
       return listing.sellerInformation.sellerId;
     } else {
+      let sellerId = null;
+      getSellerAnchors(item).forEach(e => {
+        let id = (e.href.match(/\/([0-9]+)\/$/)||[])[1];
+        if (id) {
+          sellerId = Number.parseInt(id);
+        }
+      });
+      if (sellerId) {
+        return sellerId;
+      }
       console.log("DID NOT FOUND MATCH", listings, item);
     }
     return null;
@@ -100,7 +108,7 @@ let listings = [];
       console.log("Ban seller?", bannedName);
     }
     if (bannedName) {
-    	if (confirm('Are you sure you want to ban seller ' + bannedName + "?")) {
+      if (confirm('Are you sure you want to ban seller ' + bannedName + "?")) {
         bannedSellers.push(bannedName);
         GM_setValue("marktplaatsbannedsellers", bannedSellers);
         if (debug) {
@@ -113,12 +121,23 @@ let listings = [];
     }
   };
 
+  let getSellerAnchors = function(item) {
+		return [...item.querySelectorAll(".hz-Listing-sellerInfo a, .hz-Listing-sellerInfoPriority a")];
+  };
+  
   removeCrap = function(bannedSellers) {
     if (debug) {
       console.log('removeCrap, bannedSellers', bannedSellers);
     }
+
     removeBanners();
 
+    if (!listings.length) {
+      listings = JSON.parse(document.getElementById('__NEXT_DATA__')?.innerText)?.props?.pageProps?.searchRequestAndResponse?.listings;
+      listings.forEach(listing => listing.img = ((listing.pictures || [])[0] || { url: '' }).url.split('$')[0]);
+      console.log('listings', listings);
+    }
+    
     let items = document.querySelectorAll(".hz-Listing");
     for (let item of items) {
       if (item.innerText.match(/(Bezorgt in|Topadvertentie|Dagtopper|Heel Nederland|Bezoek website|Naar website|huur|Gevraagd|Gezocht)/i)) {
@@ -130,20 +149,24 @@ let listings = [];
       // check banned sellers
       let bannedName = getBannedName(item);
       if (bannedSellers.includes(bannedName)) {
-        if (debug) {
+        //if (debug) {
           console.log("Hide seller", bannedName);
-        }
+        //}
         item.style.display = "none";
       }
       if (!item.getAttribute('data-has-delete')) {
-        let sellerElements = item.querySelectorAll(".hz-Listing-sellerInfo a, .hz-Listing-sellerInfoPriority a");
-        
+        let sellerElements = getSellerAnchors(item);
+
         sellerElements.forEach(sellerElement => {
-          item.setAttribute('data-has-delete', "true");
+          if (debug) {
+            console.warn("Found sellerElement", sellerElement, item);
+          }
           let sellerDeleteActionElement = document.createElement('div');
           sellerDeleteActionElement.className = 'sellerDeleteAction';
           sellerDeleteActionElement.addEventListener("click", sellerDeleteAction);
+          sellerDeleteActionElement.innerText = "💀";
           sellerElement.appendChild(sellerDeleteActionElement);
+          item.setAttribute('data-has-delete', "true");
         });
       }
     }
@@ -153,7 +176,7 @@ let listings = [];
   if (typeof GM_getValue !== 'undefined') {
     bannedSellers = GM_getValue("marktplaatsbannedsellers", bannedSellers);
   }
- 	let ignoreUser = window.location.pathname.startsWith("/u");
+  let ignoreUser = window.location.pathname.startsWith("/u");
   addEventListener("load", () => {
     // monitor future changes
     const observer = new MutationObserver(function() {
@@ -185,12 +208,11 @@ let addStyle = function(css) {
 };
 
 addStyle(`
-      .sellerDeleteAction::before {
-          display: block;
-          content: "💀";
-          font-size: 8mm;
-          margin: 4px 0 0px 10px;
+
+			.sellerDeleteAction {
+      	font-size: 8mm;
       }
+
       /* show seller name and delete action on mobile */
       html body .hz-Listing--list-item .hz-Listing--sellerInfo,
       html body .hz-Listing-seller-name-container {
